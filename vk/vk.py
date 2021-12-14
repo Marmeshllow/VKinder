@@ -7,9 +7,10 @@ vk_grp = VkApi(token=group_token)
 longpoll = VkLongPoll(vk_grp)
 
 
-def vk_msg(user_id, message, attachment=None):
+def vk_msg(user_id, message, attachment=None, keyboard=None):
     vk_grp.method('messages.send', {'user_id': user_id, 'message': message,
                                     'attachment': attachment,
+                                    'keyboard': keyboard,
                                     'random_id': randrange(10 ** 7)})
 
 
