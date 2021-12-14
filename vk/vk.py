@@ -51,11 +51,12 @@ class Vk(VkApi):
 
     def user_info(self, user_id):
         info = self.method('users.get', {'user_id': user_id, 'fields': 'bdate, sex, city, relation'})[0]
-        if not info.get('is_closed'):
-            res = [info.get('sex'), info.get('bdate'), info.get('city'), info.get('relation')]
-            return res
-        else:
-            return "Профиль скрыт"
+        res = [info.get('sex'), info.get('bdate'), info.get('city'), info.get('relation')]
+        return res
+
+    def is_closed(self, user_id):
+        info = self.method('users.get', {'user_id': user_id})[0]
+        return info.get('is_closed')
 
     def search_users(self, info_list):
         info = prepare_info(info_list)
@@ -63,3 +64,4 @@ class Vk(VkApi):
         res = self.method('users.search',
                           {'sex': sex, 'status': 6, 'birth_year': year, 'hometown': city, 'has_photo': 1})
         return res
+
