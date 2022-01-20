@@ -1,0 +1,5 @@
+group_token = ''
+user_token = ''
+bd_user = ''
+bd_password = ''
+DB_name = ''

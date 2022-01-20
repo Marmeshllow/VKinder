@@ -1,9 +1,14 @@
 import psycopg2
-import sqlalchemy as sq
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from VK_token import bd_user, bd_password
 from bd.database import session, Match
+
+
+def is_online():
+    try:
+        session.query(Match).first()
+    except psycopg2.OperationalError:
+        return False
+    else:
+        return True
 
 
 def is_in_db(user_id, couple_id):

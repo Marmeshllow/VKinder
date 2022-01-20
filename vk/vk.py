@@ -1,10 +1,37 @@
-from random import randrange
+from random import randrange, shuffle
 from vk_api.longpoll import VkLongPoll
 from vk_api.vk_api import VkApi
-from VK_token import group_token
+from Settings import group_token, user_token
+from bd.query import is_in_db, add_in_db, is_online
+from vk.keyboard.keyboard import get_keyboard_continue
 
-vk_grp = VkApi(token=group_token)
-longpoll = VkLongPoll(vk_grp)
+
+def json_to_list(response):
+    result = []
+    for el in response['items']:
+        if not el['is_closed']:
+            result.append(el)
+    if len(result) > 0:
+        shuffle(result)
+    return result
+
+
+def get_couple(user_id, people: list):
+    for el in people:
+        if is_online():
+            if is_in_db(user_id, el['id']) or user.is_closed(el['id']):
+                print(f'{el["id"]} есть в базе или закрытый профиль')
+            else:
+                photo = user.get_photo(el["id"])
+                vk_msg(user_id, f'Лови\n vk.com/id{el["id"]}',
+                       attachment=','.join(photo), keyboard=get_keyboard_continue())
+                add_in_db(user_id, el["id"])
+                return
+        else:
+            photo = user.get_photo(el["id"])
+            vk_msg(user_id, f'База данных не доступна. Могут возникать повторы :(\nЛови\n'
+                            f' vk.com/id{el["id"]}', attachment=','.join(photo), keyboard=get_keyboard_continue())
+            return
 
 
 def vk_msg(user_id, message, attachment=None, keyboard=None):
@@ -14,8 +41,8 @@ def vk_msg(user_id, message, attachment=None, keyboard=None):
                                     'random_id': randrange(10 ** 7)})
 
 
-def get_vk(user_token):
-    vk = Vk(token=user_token)
+def get_vk(token):
+    vk = Vk(token=token)
     return vk
 
 
@@ -62,7 +89,17 @@ class Vk(VkApi):
     def search_users(self, info_list):
         info = prepare_info(info_list)
         sex, year, city = info
-        res = self.method('users.search',
-                          {'sex': sex, 'status': 6, 'birth_year': year, 'hometown': city, 'has_photo': 1})
+        res = self.method('users.search', {'sex': sex, 'status': 6, 'birth_year': year,
+                                           'hometown': city, 'has_photo': 1, 'count': 500})
         return res
 
+    def ad_search(self, info_list):
+        res = self.method('users.search',
+                          {'sex': info_list[0], 'status': 6, 'age_from': info_list[1][0], 'age_to': info_list[1][1],
+                           'hometown': info_list[2], 'has_photo': 1, 'count': 500})
+        return res
+
+
+vk_grp = VkApi(token=group_token)
+longpoll = VkLongPoll(vk_grp)
+user = get_vk(user_token)

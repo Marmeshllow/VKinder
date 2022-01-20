@@ -2,10 +2,11 @@ import psycopg2
 import sqlalchemy as sq
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from VK_token import bd_user, bd_password
+from Settings import bd_user, bd_password, DB_name
+
 
 Base = declarative_base()
-engine = sq.create_engine(f'postgresql://{bd_user}:{bd_password}@localhost:5432/vkinder')
+engine = sq.create_engine(f'postgresql://{bd_user}:{bd_password}@localhost:5432/{DB_name}')
 Session = sessionmaker(bind=engine)
 
 
